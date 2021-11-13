@@ -40,3 +40,13 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
         if self.username:
             return self.username
         return str(self.phone)
+
+
+class PhoneOtp(models.Model):
+    phone = models.CharField(max_length=11,validators=[regex])
+    code = models.IntegerField()
+    verfied = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.phone}'s otp"

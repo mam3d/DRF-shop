@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser, PhoneOtp
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 @admin.register(CustomUser)
@@ -25,4 +25,4 @@ class UserAdmin(UserAdmin):
         }),
     )
     
-
+admin.site.register(PhoneOtp)
