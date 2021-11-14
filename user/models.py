@@ -46,7 +46,7 @@ class PhoneOtp(models.Model):
     phone = models.CharField(max_length=11,validators=[regex])
     code = models.IntegerField()
     verfied = models.BooleanField(default=False)
-    quantity = models.PositiveIntegerField()
+    counter = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return f"{self.phone}'s otp"
