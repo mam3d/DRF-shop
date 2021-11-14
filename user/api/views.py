@@ -5,6 +5,8 @@ from ..models import CustomUser, PhoneOtp
 import random
 from .serializers import PhoneSerializer, UserRegisterSerializer
 from kavenegar import *
+from knox.models import AuthToken
+from rest_framework.permissions import AllowAny
 
 
 
@@ -20,6 +22,7 @@ def send_sms(code,phone):
     response = api.sms_send( params)
 
 class ValidatePhone(APIView):
+    authentication_classes = []
     def post(self,request):
         serializer = PhoneSerializer(data=request.data)
         if serializer.is_valid():
@@ -36,7 +39,7 @@ class ValidatePhone(APIView):
                 otp.code = random.randint(9999,99999)
                 otp.counter += 1
                 otp.save()
-                send_sms(otp.code,otp.phone)
+                # send_sms(otp.code,otp.phone)
                 return Response(
                     {"success":"the code has been successfully sent to your phone"},
                     status = status.HTTP_200_OK
@@ -44,7 +47,7 @@ class ValidatePhone(APIView):
 
             else:
                 otp = PhoneOtp.objects.create(phone=phone,code=random.randint(9999,99999))
-                send_sms(otp.code,otp.phone)
+                # send_sms(otp.code,otp.phone)
                 return Response(
                     {"success":"the code has been successfully sent to your phone"},
                     status = status.HTTP_200_OK
@@ -55,20 +58,19 @@ class ValidatePhone(APIView):
 
 
 class RegisterView(APIView):
+    authentication_classes = []
     def post(self,request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             phone = serializer.validated_data.get("phone")
-            phoneot_qs = PhoneOtp.objects.filter(phone=phone)
-            if phoneot_qs.exists():
-                phoneotp = phoneot_qs[0]
-                code = request.data.get("code")
-                if phoneotp.code == int(code):
-                    serializer.save()
-                    phoneotp.delete()
-                    phoneotp.save()
-                    return Response(serializer.data,status=status.HTTP_201_CREATED)
-                else:
-                    return Response({"failed":"wrong code"},status=status.HTTP_400_BAD_REQUEST)
-            return Response({"failed":"you have to verify your number first"},status=status.HTTP_400_BAD_REQUEST)
+            phoneotp = PhoneOtp.objects.get(phone=phone)
+            code = request.data.get("code")
+            if phoneotp.code == int(code):
+                user = serializer.save()
+                token = AuthToken.objects.create(user=user)
+                return Response(headers={"Authorization":f"Tokenkey {token[0].token_key}"},status=status.HTTP_201_CREATED)
+            else:
+                return Response({"failed":"wrong code"},status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
