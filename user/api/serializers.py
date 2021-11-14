@@ -15,8 +15,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = ["phone","password","password2"]
 
     def validate_phone(self,value):
-        user = CustomUser.objects.get(phone=value)
-        if user:
+        user = CustomUser.objects.filter(phone=value)
+        if user.exists():
             raise serializers.ValidationError("this phone number already taken")
         return value
 
@@ -44,8 +44,8 @@ class PhoneSerializer(serializers.Serializer):
 
 
     def validate_phone(self,value):
-        user = CustomUser.objects.get(phone=value)
-        if user:
+        user = CustomUser.objects.filter(phone=value)
+        if user.exists():
             raise serializers.ValidationError("this phone number already taken")
         return value
         
