@@ -22,7 +22,6 @@ def send_sms(code,phone):
     response = api.sms_send( params)
 
 class ValidatePhone(APIView):
-    authentication_classes = []
     def post(self,request):
         serializer = PhoneSerializer(data=request.data)
         if serializer.is_valid():
@@ -58,7 +57,6 @@ class ValidatePhone(APIView):
 
 
 class RegisterView(APIView):
-    authentication_classes = []
     def post(self,request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
