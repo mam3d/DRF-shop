@@ -49,3 +49,13 @@ class RegisterViewTest(TestCase):
         response = self.client.post(self.url,data={"phone":"09026673395","password":"testing321","password2":"testing321","code":1234})
         self.assertEqual(response.status_code,400)
 
+
+class LoginViewTest(TestCase):
+
+    def setUp(self):
+        self.url = reverse("login")
+    
+    def test_user_can_log_in(self):
+        CustomUser.objects.create(phone="09026673395",password="testing321")
+        response = self.client.post({"phone":"09026673395","password":"testing321"})
+        self.assertEqual(response.status_code,200)
