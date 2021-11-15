@@ -7,14 +7,6 @@ from user.models import CustomUser, PhoneOtp
 class ValidatePhoneViewTest(TestCase):
     def setUp(self):
         self.url = reverse("validate-phone")
-
-    def test_serializer_isvalid(self):
-        serializer = PhoneSerializer(data={"phone":"09036673395"})
-        self.assertTrue(serializer.is_valid())
-
-    def test_serializer_notvalid(self):
-        serializer = PhoneSerializer(data={"phone":"0902667safs3395"})
-        self.assertFalse(serializer.is_valid())
         
     def test_phone_already_registerd(self):
         user = CustomUser.objects.create(phone="09036673395")
@@ -46,17 +38,6 @@ class RegisterViewTest(TestCase):
 
     def setUp(self):
         self.url = reverse("register")
-
-    def test_serializer_isvalid(self):
-        serializer = PhoneSerializer(data={"phone":"09036673395","password":"testing321","password2":"testing321"})
-        self.assertTrue(serializer.is_valid())
-
-    def test_serializer_notvalid(self):
-        user = CustomUser.objects.create(phone="09026673395")
-        serializer = PhoneSerializer(data={"phone":"09026673395","password":"testing321","password2":"testing321"})
-        serializer2 = PhoneSerializer(data={"phone":"09026673395","password":"testing321","password2":"testing321"})
-        self.assertFalse(serializer.is_valid())
-        self.assertFalse(serializer2.is_valid())
 
     def test_user_created(self):
         phoneotp = PhoneOtp.objects.create(phone="09026673395",code=1234)
