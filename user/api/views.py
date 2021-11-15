@@ -1,17 +1,20 @@
+
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-from ..models import CustomUser, PhoneOtp
+from rest_framework import  status
+from django.contrib.auth import login,authenticate
+from ..models import PhoneOtp
 import random
-from .serializers import PhoneSerializer, UserRegisterSerializer
+from .serializers import PhoneSerializer, UserRegisterSerializer, LoginSerializer
 from kavenegar import *
 from knox.models import AuthToken
-from rest_framework.permissions import AllowAny
+from knox.views import LoginView as KnoxLoginView
 
 
 
 def send_sms(code,phone):
-    api = KavenegarAPI('456A67346D4E4E5476636657356F6B784D6E36507653394D586B6D342F6F656B6A756D49347261384C2F303D')
+    api = KavenegarAPI('')
     params = { 
         'receptor': phone,
         'message' :f"""
@@ -65,10 +68,12 @@ class RegisterView(APIView):
             code = request.data.get("code")
             if phoneotp.code == int(code):
                 user = serializer.save()
+                phoneotp.delete()
                 token = AuthToken.objects.create(user=user)
-                return Response(headers={"Authorization":f"Tokenkey {token[0].token_key}"},status=status.HTTP_201_CREATED)
+                return Response(headers={"Authorization":f"Token {token[1]}"},status=status.HTTP_201_CREATED)
             else:
                 return Response({"failed":"wrong code"},status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
 
 
