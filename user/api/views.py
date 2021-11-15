@@ -9,7 +9,6 @@ import random
 from .serializers import PhoneSerializer, UserRegisterSerializer, LoginSerializer
 from kavenegar import *
 from knox.models import AuthToken
-from knox.views import LoginView as KnoxLoginView
 
 
 
@@ -77,3 +76,12 @@ class RegisterView(APIView):
 
 
 
+
+class LoginView(APIView):
+    def post(self,request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data
+            token = AuthToken.objects.create(user=user)
+            return Response(headers={"Authorization":f"Token {token[1]}"},status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)

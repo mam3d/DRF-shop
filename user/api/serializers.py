@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from ..models import CustomUser, PhoneOtp
-from django.core.validators import RegexValidator
+from django.contrib.auth import authenticate
 import re
 def length_validator(value):
     if len(value) < 8:
@@ -56,3 +56,16 @@ class PhoneSerializer(serializers.Serializer):
             raise serializers.ValidationError("this phone number already taken")
         return value
         
+
+
+class LoginSerializer(serializers.Serializer):
+    phone = serializers.CharField(validators=[regex_validator])
+    password = serializers.CharField()
+
+    def validate(self,data):
+        phone = data.get("phone")
+        password = data.get("password")
+        user = authenticate(username=phone,password=password)
+        if user is None:
+            raise serializers.ValidationError("phone number or password is inccorect")
+        return user
