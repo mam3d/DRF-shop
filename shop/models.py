@@ -22,7 +22,7 @@ class Product(models.Model):
     description = models.TextField(blank=True,null=True)
     image = models.ImageField(blank=True,null=True)
     price = models.PositiveIntegerField()
-    category = models.ForeignKey(Category,on_delete=models.SET_NULL,blank=True,null=True)
+    category = models.ForeignKey(Category,on_delete=models.SET_NULL,blank=True,null=True,related_name="products")
     is_available = models.BooleanField(default=True)
     availability = models.IntegerField()
     slug = models.SlugField(unique=True)
