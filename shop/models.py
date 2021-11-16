@@ -41,4 +41,18 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.user}'s order"
+
+
+class OrderItem(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    user  = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    order = models.ForeignKey(Order,on_delete=models.CASCADE,verbose_name="orders")
+
+    @property
+    def total_product_price(self):
+        return self.product.price * self.quantity
+
+    def __str__(self):
+        return f"{self.user}'s orderitem"
