@@ -4,10 +4,15 @@ from django.template.defaultfilters import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-
+    slug = models.SlugField(unique=True)
     def __str__(self):
         return self.name
- 
+
+    def save(self,*args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        
+        return super().save(*args, **kwargs)
     class Meta:
         verbose_name_plural = "categories"
 
