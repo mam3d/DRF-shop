@@ -42,3 +42,21 @@ class ProductAdd(APIView):
             orderitem.save()
             return Response({"product":product.name,"successfull":"your product's quantity has been increased"},status=status.HTTP_201_CREATED)
 
+class ProductRemove(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,id):
+        product = get_object_or_404(Product,id=id)
+        orderitem_qs = OrderItem.objects.filter(user=request.user,product=product)
+        order = Order.objects.filter(user=request.user,is_ordered=False)
+        if orderitem_qs.exists():
+            orderitem = orderitem_qs[0]
+            if orderitem.quantity > 1:
+                orderitem.quantity -= 1
+                orderitem.save()
+                return Response({"successfull":"your product quantity updated"},status=status.HTTP_200_OK)
+            orderitem.delete()
+            return Response({"successfull":"product removed from your cart"},status=status.HTTP_200_OK)
+
+                
+        else:
+            return Response({"error":"this product isn't in your cart"},status=status.HTTP_400_BAD_REQUEST)
