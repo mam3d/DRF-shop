@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.template.defaultfilters import slugify
 
 class Category(models.Model):
@@ -32,3 +33,12 @@ class Product(models.Model):
             self.slug = slugify(self.name)
         
         return super().save(*args, **kwargs)
+
+
+class Order(models.Model):
+    user  = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    is_ordered = models.BooleanField(default=False)
+    date_ordered = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
