@@ -69,7 +69,7 @@ class RegisterView(APIView):
                 user = serializer.save()
                 phoneotp.delete()
                 token = AuthToken.objects.create(user=user)
-                return Response(headers={"Authorization":f"Token {token[1]}"},status=status.HTTP_201_CREATED)
+                return Response({"user":user.phone},headers={"Authorization":f"Token {token[1]}"},status=status.HTTP_201_CREATED)
             else:
                 return Response({"failed":"wrong code"},status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
