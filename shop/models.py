@@ -12,7 +12,7 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
     class Meta:
         verbose_name_plural = "categories"
 
@@ -37,7 +37,7 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class Order(models.Model):
@@ -47,13 +47,13 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.user}'s order"
-
+    @property
     def total_order_price(self):
         total = 0
         for order in self.orderitem_set.all():
             total += order.total_product_price
-
         return total
+
 class OrderItem(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
