@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from shop.models import Category, OrderItem,Product,Order
+from shop.models import Category, OrderItem,Product,Order,DiscountCode
 
 class CategorySerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="category",lookup_field ="slug")
@@ -39,3 +39,14 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_user(self,obj):
         return obj.user.username
+
+class DiscountCodeSerializer(serializers.Serializer):
+    code = serializers.CharField()
+
+    def validate(self,data):
+        code = data.get("code")
+        discountcode = DiscountCode.objects.filter(code=code)
+        if discountcode.exists():
+            discountcode = discountcode[0]
+            return discountcode
+        raise serializers.ValidationError("wrong code")

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Order, OrderItem, Product
+from .models import Category, DiscountCode, Order, OrderItem, Product
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
@@ -22,7 +22,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["user","date_ordered","is_ordered","total_order_price"]
+    list_display = ["user","date_ordered","is_ordered","total_order_price",]
     list_filter = ["date_ordered","is_ordered"]
     inlines = [OrderItemInline]
 
@@ -30,3 +30,9 @@ class OrderAdmin(admin.ModelAdmin):
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ["user","product","quantity","total_product_price","order"]
     list_filter = ["user","product",]
+
+
+@admin.register(DiscountCode)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ["code","price","is_active"]
+    list_filter = ["is_active"]

@@ -7,7 +7,7 @@ from rest_framework import serializers, status
 from rest_framework import generics
 from shop.models import Category, Order, OrderItem, Product
 from .serializers import (
-    CartSerializer, CategoryDetailSerializer,CategorySerializer,ProductSerializer
+    CartSerializer, CategoryDetailSerializer,CategorySerializer, DiscountCodeSerializer,ProductSerializer
 )
 
 class CategoryListView(generics.ListAPIView):
@@ -73,3 +73,21 @@ class Cart(APIView):
             serializer = CartSerializer(order)
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response({"empty":"your cart is empty"})
+
+class AddDiscount(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        serializer = DiscountCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            code = serializer.validated_data
+            order = Order.objects.filter(user=request.user,is_ordered=False)
+            if order.exists():
+                order = order[0]
+                if  not order.discount:
+                    order.discount = code.price
+                    order.save()
+                    return Response({"successfull":"discount added to your cart"},status=status.HTTP_200_OK)
+                else:
+                    return Response({"error":"you have already used discount code"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error":"you dont have active order"},status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)

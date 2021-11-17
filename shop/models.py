@@ -44,6 +44,7 @@ class Order(models.Model):
     user  = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     is_ordered = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(auto_now_add=True)
+    discount = models.IntegerField(blank=True,null=True)
 
     def __str__(self):
         return f"{self.user}'s order"
@@ -52,8 +53,13 @@ class Order(models.Model):
         total = 0
         for order in self.orderitems.all():
             total += order.total_product_price
-        return total
+            if self.discount:
+                total -= self.discount
+                return total
+            return total
 
+
+                
 class OrderItem(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
@@ -66,3 +72,12 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.user}'s orderitem"
+
+
+class DiscountCode(models.Model):
+    code = models.CharField(max_length=100)
+    price = models.IntegerField()
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.price} discount code"
