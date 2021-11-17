@@ -50,7 +50,7 @@ class Order(models.Model):
     @property
     def total_order_price(self):
         total = 0
-        for order in self.orderitem_set.all():
+        for order in self.orderitems.all():
             total += order.total_product_price
         return total
 
@@ -58,7 +58,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     user  = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="orderitems")
 
     @property
     def total_product_price(self):

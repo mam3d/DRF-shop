@@ -1,12 +1,13 @@
+
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework import generics
 from shop.models import Category, Order, OrderItem, Product
 from .serializers import (
-    CategoryDetailSerializer,CategorySerializer,ProductSerializer
+    CartSerializer, CategoryDetailSerializer,CategorySerializer,ProductSerializer
 )
 
 class CategoryListView(generics.ListAPIView):
@@ -60,3 +61,15 @@ class ProductRemove(APIView):
                 
         else:
             return Response({"error":"this product isn't in your cart"},status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class Cart(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        orderqs = Order.objects.filter(user=request.user,is_ordered=False)
+        if orderqs:
+            order = orderqs[0]
+            serializer = CartSerializer(order)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response({"empty":"your cart is empty"})

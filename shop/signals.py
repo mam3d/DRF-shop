@@ -3,7 +3,7 @@ from .models import OrderItem,Order
 
 def order_delete(sender,instance,using,**kwargs):
     order = instance.order
-    orderitems = order.orderitem_set.all()
+    orderitems = order.orderitems.all()
     if not orderitems:
         order.delete()
 
