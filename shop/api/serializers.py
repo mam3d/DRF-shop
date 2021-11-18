@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from shop.models import Category, OrderItem,Product,Order,DiscountCode, VariationChoice,Variation
-
+from django.core.validators import RegexValidator
 class CategorySerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="category",lookup_field ="slug")
     class Meta:

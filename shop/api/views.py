@@ -1,11 +1,11 @@
-
+import json
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework import serializers, status
+from rest_framework import  status
 from rest_framework import generics
-from shop.models import Category, Order, OrderItem, Product
+from shop.models import Category, Order, OrderItem, Product, VariationChoice
 from .serializers import (
     CartSerializer, CategoryDetailSerializer,CategorySerializer, DiscountCodeSerializer,ProductSerializer,
     ProductDetailSerializer,
@@ -35,33 +35,43 @@ class ProductAdd(APIView):
     permission_classes = [IsAuthenticated]
     def post(self,request,id):
         product = get_object_or_404(Product,id=id)
+        variations = request.data.get("variations")
+        variations= json.loads(variations)
         order,created = Order.objects.get_or_create(user=request.user,is_ordered=False)
-        orderitem,created = OrderItem.objects.get_or_create(user=request.user,product=product,order=order)
-        if created:
-            return Response({"product":product.name,"successfull":"product added to your cart"},status=status.HTTP_201_CREATED)
-        else:
+        orderitemqs = OrderItem.objects.filter(user=request.user,product=product,order=order,variation_choices__id__in=variations)
+        if orderitemqs.exists():
+            orderitem = orderitemqs[0]
             orderitem.quantity += 1
             orderitem.save()
-            return Response({"product":product.name,"successfull":"your product's quantity has been increased"},status=status.HTTP_201_CREATED)
+            return Response({"successfull":"product quantity increased"},status=status.HTTP_200_OK)
+        else:
+            orderitem = OrderItem.objects.create(user=request.user,product=product,order=order)
+            orderitem.variation_choices.add(*variations)
+            return Response({"successfull":"product add to your cart"},status=status.HTTP_200_OK)
+        
 
 class ProductRemove(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self,request,id):
         product = get_object_or_404(Product,id=id)
-        orderitem_qs = OrderItem.objects.filter(user=request.user,product=product)
+        variations = request.data.get("variations")
+        variations= json.loads(variations)
         order = Order.objects.filter(user=request.user,is_ordered=False)
-        if orderitem_qs.exists():
-            orderitem = orderitem_qs[0]
-            if orderitem.quantity > 1:
-                orderitem.quantity -= 1
-                orderitem.save()
-                return Response({"successfull":"your product quantity updated"},status=status.HTTP_200_OK)
-            orderitem.delete()
-            return Response({"successfull":"product removed from your cart"},status=status.HTTP_200_OK)
-
-                
-        else:
-            return Response({"error":"this product isn't in your cart"},status=status.HTTP_400_BAD_REQUEST)
+        if order.exists():
+            order = order[0]
+            orderitemqs = OrderItem.objects.filter(user=request.user,product=product,order=order,variation_choices__id__in=variations)
+            if orderitemqs.exists():
+                orderitem = orderitemqs.first()
+                if orderitem.quantity > 1:
+                    orderitem.quantity -= 1
+                    orderitem.save()
+                    return Response({"successfull":"your product quantity decreased"},status=status.HTTP_200_OK)
+                orderitem.delete()
+                return Response({"successfull":"product removed from your cart"},status=status.HTTP_200_OK)    
+            else:
+                return Response({"error":"this product isn't in your cart"},status=status.HTTP_400_BAD_REQUEST)
+        return  Response({"error":"your cart is empty"},status=status.HTTP_400_BAD_REQUEST)
 
 
 
