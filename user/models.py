@@ -26,7 +26,9 @@ class UserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser,PermissionsMixin):
     phone = models.CharField(max_length=11,unique=True,validators=[regex])
-    username = models.CharField(max_length=100,blank=True,null=True)
+    name = models.CharField(max_length=100,blank=True,null=True)
+    address = models.CharField(max_length=100,blank=True,null=True)
+    postal_code = models.IntegerField(blank=True,null=True)
     date_joined  = models.DateTimeField(auto_now_add=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -37,8 +39,8 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
 
     
     def __str__(self):
-        if self.username:
-            return self.username
+        if self.name:
+            return self.name
         return str(self.phone)
 
 
