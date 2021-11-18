@@ -1,5 +1,6 @@
+
 from rest_framework import serializers
-from shop.models import Category, OrderItem,Product,Order,DiscountCode
+from shop.models import Category, OrderItem,Product,Order,DiscountCode, VariationChoice,Variation
 
 class CategorySerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="category",lookup_field ="slug")
@@ -12,6 +13,26 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['url',"name","description","price"]
+
+class VariationChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VariationChoice
+        fields = ["id","choice"]
+
+class VariationSerializer(serializers.ModelSerializer):
+    variationchoice = serializers.SerializerMethodField()
+    class Meta:
+        model = Variation
+        fields = ["name","variationchoice"]
+
+    def get_variationchoice(self,obj):
+        return VariationChoiceSerializer(obj.variationchoice_set.all(),many=True).data
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    variation = VariationSerializer(many=True)
+    class Meta:
+        model = Product
+        fields = ["name","description","price","variation"]
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):

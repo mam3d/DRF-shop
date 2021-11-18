@@ -7,7 +7,8 @@ from rest_framework import serializers, status
 from rest_framework import generics
 from shop.models import Category, Order, OrderItem, Product
 from .serializers import (
-    CartSerializer, CategoryDetailSerializer,CategorySerializer, DiscountCodeSerializer,ProductSerializer
+    CartSerializer, CategoryDetailSerializer,CategorySerializer, DiscountCodeSerializer,ProductSerializer,
+    ProductDetailSerializer,
 )
 
 class CategoryListView(generics.ListAPIView):
@@ -26,7 +27,7 @@ class ProductListView(generics.ListAPIView):
 
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.filter(is_available=True)
-    serializer_class = ProductSerializer
+    serializer_class = ProductDetailSerializer
     lookup_field = "slug"
 
 
