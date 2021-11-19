@@ -1,12 +1,12 @@
 
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import  status
-from django.contrib.auth import login,authenticate
-from ..models import PhoneOtp
+from django.shortcuts import get_object_or_404
+from ..models import CustomUser, PhoneOtp
 import random
-from .serializers import PhoneSerializer, UserRegisterSerializer, LoginSerializer
+from .serializers import PhoneSerializer, UserRegisterSerializer, LoginSerializer,UserInfoSerializer
 from kavenegar import *
 from knox.models import AuthToken
 
@@ -84,4 +84,22 @@ class LoginView(APIView):
             user = serializer.validated_data
             token = AuthToken.objects.create(user=user)
             return Response(headers={"Authorization":f"Token {token[1]}"},status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class UserInfoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        user = get_object_or_404(CustomUser,phone=request.user.phone)
+        serializer = UserInfoSerializer(user)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+    def put(self,request):
+        user = get_object_or_404(CustomUser,phone=request.user.phone)
+        serializer = UserInfoSerializer(user,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)

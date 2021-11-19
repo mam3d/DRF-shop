@@ -1,4 +1,4 @@
-from user.api.serializers import PhoneSerializer,UserRegisterSerializer,LoginSerializer
+from user.api.serializers import PhoneSerializer,UserRegisterSerializer,LoginSerializer,UserInfoSerializer
 from django.test import TestCase
 from user.models import CustomUser, PhoneOtp
 
@@ -63,5 +63,27 @@ class LoginSerializerTest(TestCase):
             "password":"",
         }
         serializer =  LoginSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+
+
+class   UserInfoSerializerTest(TestCase):
+    def test_is_valid(self):
+        user = CustomUser.objects.create_user(phone="09026673395",password="testing321")
+        data = {
+            "name":"sss",
+            "address":"test",
+            "postal_code": 1236
+        }
+        serializer =  UserInfoSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+
+    def test_not_valid(self):
+        user = CustomUser.objects.create_user(phone="09026673395",password="testing321")
+        data = {
+            "name":1234,
+            "address":4554,
+            "postal_code": "ss"
+        }
+        serializer =  UserInfoSerializer(data=data)
         self.assertFalse(serializer.is_valid())
 

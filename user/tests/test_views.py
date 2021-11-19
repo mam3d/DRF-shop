@@ -56,6 +56,6 @@ class LoginViewTest(TestCase):
         self.url = reverse("login")
     
     def test_user_can_log_in(self):
-        CustomUser.objects.create(phone="09026673395",password="testing321")
-        response = self.client.post({"phone":"09026673395","password":"testing321"})
+        CustomUser.objects.create_user(phone="09026673395",password="testing321")
+        response = self.client.post(self.url,{"phone":"09026673395","password":"testing321"})
         self.assertEqual(response.status_code,200)

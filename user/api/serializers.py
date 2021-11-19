@@ -69,3 +69,12 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError("phone number or password is inccorect")
         return user
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["name","phone","address","postal_code"]
+        extra_kwargs = {
+            "phone":{"read_only":True}
+        }
