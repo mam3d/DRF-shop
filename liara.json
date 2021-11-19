@@ -1,0 +1,8 @@
+{
+    "disks":[
+        {
+            "name":"sqllite3",
+            "mountTo":"data"
+        }
+    ]
+}
