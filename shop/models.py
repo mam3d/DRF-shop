@@ -39,7 +39,7 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     availability = models.IntegerField()
     slug = models.SlugField(unique=True)
-    variation = models.ManyToManyField(Variation)
+    variation = models.ManyToManyField(Variation,blank=True)
 
     def __str__(self):
         return self.name
@@ -66,10 +66,10 @@ class Order(models.Model):
         total = 0
         for order in self.orderitems.all():
             total += order.total_product_price
-            if self.discount:
-                total -= self.discount
-                return total
+        if self.discount:
+            total -= self.discount
             return total
+        return total
 
 
                 
@@ -78,7 +78,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     user  = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="orderitems")
-    variation_choices = models.ManyToManyField(VariationChoice)
+    variation_choices = models.ManyToManyField(VariationChoice,blank=True)
 
     @property
     def total_product_price(self):

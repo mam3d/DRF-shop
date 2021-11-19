@@ -41,7 +41,7 @@ class OrderItemTest(TestCase):
             is_available = True,
             availability = 2,
         )
-        user = get_user_model().objects.create_user(username="ali")
+        user = get_user_model().objects.create_user(phone="09026673395",password="testing321")
         order = Order.objects.create(user=user)
         self.orderitem = OrderItem.objects.create(
             product = product,
@@ -53,8 +53,8 @@ class OrderItemTest(TestCase):
 
     def test_model(self):
         self.assertEqual(self.orderitem.product.name,"ps5")
-        self.assertEqual(self.orderitem.user.username,"ali")
-        self.assertEqual(str(self.orderitem),"ali's orderitem")
+        self.assertEqual(self.orderitem.user.phone,"09026673395")
+        self.assertEqual(str(self.orderitem),"09026673395's orderitem")
         self.assertEqual(self.orderitem.total_product_price,240)
 
 
@@ -62,11 +62,11 @@ class OrderTest(TestCase):
     def setUp(self):
         product = Product.objects.create(
             name="ps5",
-            price = 120,
+            price = 100,
             is_available = True,
             availability = 2,
         )
-        user = get_user_model().objects.create_user(username="ali")
+        user = get_user_model().objects.create_user(phone="09026673395",password="testing321")
         self.order = Order.objects.create(user=user)
         orderitem1 = OrderItem.objects.create(
             product = product,
@@ -78,12 +78,12 @@ class OrderTest(TestCase):
             product = product,
             user = user,
             order = self.order,
-            quantity = 2
+            quantity = 1
         )
         
 
     def test_model(self):
-        self.assertEqual(self.order.user.username,"ali")
+        self.assertEqual(self.order.user.phone,"09026673395")
         self.assertFalse(self.order.is_ordered)
-        self.assertEqual(str(self.order),"ali's order")
-        self.assertEqual(self.order.total_order_price,480)
+        self.assertEqual(str(self.order),"09026673395's order")
+        self.assertEqual(self.order.total_order_price,300)
