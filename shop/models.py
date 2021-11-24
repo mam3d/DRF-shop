@@ -58,6 +58,8 @@ class Order(models.Model):
     is_ordered = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(auto_now_add=True)
     discount = models.IntegerField(blank=True,null=True)
+    idpay_track_id = models.IntegerField(blank=True,null=True)
+    idpay_code = models.CharField(max_length=100,blank=True,null=True)
 
     def __str__(self):
         return f"{self.user}'s order"
