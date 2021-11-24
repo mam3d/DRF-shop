@@ -14,5 +14,5 @@ class CustomUserModelTest(TestCase):
         self.assertEqual(str(self.user),"09358733401")
     
     def test_user_correct_format(self):
-        user = CustomUser.objects.create_user(phone="+989358733401",password="testing321")
+        user = CustomUser.objects.create_user(phone="358733401",password="testing321")
         self.assertRaises(ValueError)

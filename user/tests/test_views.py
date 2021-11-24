@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework import response
-from user.api.serializers import PhoneSerializer,UserRegisterSerializer
+from knox.models import AuthToken
 from user.models import CustomUser, PhoneOtp
+from rest_framework.test import force_authenticate
+from rest_framework.test import APIRequestFactory
 
 class ValidatePhoneViewTest(TestCase):
     def setUp(self):
@@ -49,6 +50,10 @@ class RegisterViewTest(TestCase):
         response = self.client.post(self.url,data={"phone":"09026673395","password":"testing321","password2":"testing321","code":1234})
         self.assertEqual(response.status_code,400)
 
+    def test_response_returns_token(self):
+        phoneotp = PhoneOtp.objects.create(phone="09026673395",code=1234)
+        response = self.client.post(self.url,data={"phone":"09026673395","password":"testing321","password2":"testing321","code":1234})
+        self.assertTrue(response.headers["Authorization"])
 
 class LoginViewTest(TestCase):
 
@@ -59,3 +64,10 @@ class LoginViewTest(TestCase):
         CustomUser.objects.create_user(phone="09026673395",password="testing321")
         response = self.client.post(self.url,{"phone":"09026673395","password":"testing321"})
         self.assertEqual(response.status_code,200)
+
+class UserInfoViewTest(TestCase):
+
+    def setUp(self):
+        self.url = reverse("user-info")
+        self.factory = APIRequestFactory
+    
