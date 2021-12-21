@@ -1,9 +1,11 @@
 
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin,BaseUserManager
-from django.core.validators import RegexValidator
-
-regex = RegexValidator(r'09\d{9}',"please enter correct format ex:0912***2027")
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager
+    )
+from .validators import phone_validator
 
 class UserManager(BaseUserManager):
     def create_user(self,phone,password):
@@ -25,7 +27,7 @@ class UserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser,PermissionsMixin):
-    phone = models.CharField(max_length=11,unique=True,validators=[regex])
+    phone = models.CharField(max_length=11,unique=True,validators=[phone_validator])
     name = models.CharField(max_length=100,blank=True,null=True)
     address = models.CharField(max_length=100,blank=True,null=True)
     postal_code = models.IntegerField(blank=True,null=True)
@@ -45,10 +47,9 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
 
 
 class PhoneOtp(models.Model):
-    phone = models.CharField(max_length=11,validators=[regex])
+    phone = models.CharField(max_length=11)
     code = models.IntegerField()
-    verfied = models.BooleanField(default=False)
-    counter = models.PositiveIntegerField(default=1)
+    count = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return f"{self.phone}'s otp"

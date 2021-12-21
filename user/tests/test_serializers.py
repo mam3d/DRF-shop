@@ -1,4 +1,9 @@
-from user.api.serializers import PhoneSerializer,UserRegisterSerializer,LoginSerializer,UserInfoSerializer
+from user.api.serializers import (
+    PhoneVerifySerializer,
+    UserRegisterSerializer,
+    LoginSerializer,
+    UserInfoSerializer
+    )
 from django.test import TestCase
 from user.models import CustomUser, PhoneOtp
 
@@ -6,11 +11,11 @@ from user.models import CustomUser, PhoneOtp
 class PhoneSerializerTest(TestCase):
 
     def test_serializer_isvalid(self):
-        serializer = PhoneSerializer(data={"phone":"09036673395"})
+        serializer = PhoneVerifySerializer(data={"phone":"09036673395"})
         self.assertTrue(serializer.is_valid())
 
     def test_serializer_notvalid(self):
-        serializer = PhoneSerializer(data={"phone":"0902667safs3395"})
+        serializer = PhoneVerifySerializer(data={"phone":"0902667safs3395"})
         self.assertFalse(serializer.is_valid())
 
 
@@ -21,7 +26,8 @@ class UserRegisterSerializerTest(TestCase):
         data = {
             "phone":"09026673395",
             "password":"testing321",
-            "password2":"testing321"
+            "password2":"testing321",
+            "code":1243
         }
         serializer =  UserRegisterSerializer(data=data)
         self.assertTrue(serializer.is_valid())
