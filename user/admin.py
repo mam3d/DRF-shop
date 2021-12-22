@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, PhoneOtp
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .models import (
+    CustomUser, 
+    PhoneOtp,
+    UserOrder,
+    DoublePay,
+    )
+from .forms import (
+    CustomUserCreationForm, 
+    CustomUserChangeForm
+    )
 
 @admin.register(CustomUser)
 class UserAdmin(UserAdmin):
@@ -27,3 +35,5 @@ class UserAdmin(UserAdmin):
     )
     
 admin.site.register(PhoneOtp)
+admin.site.register(UserOrder)
+admin.site.register(DoublePay)

@@ -5,31 +5,16 @@ from django.template.defaultfilters import slugify
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
+
     def __str__(self):
         return self.name
 
     def save(self,*args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        
         super().save(*args, **kwargs)
     class Meta:
         verbose_name_plural = "categories"
-
-class Variation(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class VariationChoice(models.Model):
-    choice = models.CharField(max_length=100)
-    variation = models.ForeignKey(Variation,on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.variation} {self.choice}"
-
 class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True,null=True)
@@ -39,7 +24,6 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     availability = models.IntegerField()
     slug = models.SlugField(unique=True)
-    variation = models.ManyToManyField(Variation,blank=True)
 
     def __str__(self):
         return self.name
@@ -50,27 +34,28 @@ class Product(models.Model):
             self.is_available = False
         if not self.slug:
             self.slug = slugify(self.name)
-        
+
         super().save(*args, **kwargs)
+
 
 class Order(models.Model):
     user  = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     is_ordered = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(auto_now_add=True)
     discount = models.IntegerField(blank=True,null=True)
-    idpay_track_id = models.IntegerField(blank=True,null=True)
-    idpay_code = models.CharField(max_length=100,blank=True,null=True)
 
     def __str__(self):
         return f"{self.user}'s order"
+
     @property
     def total_order_price(self):
         total = 0
         for order in self.orderitems.all():
             total += order.total_product_price
+
         if self.discount:
             total -= self.discount
-            return total
+            return total   
         return total
 
 
@@ -80,7 +65,6 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     user  = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="orderitems")
-    variation_choices = models.ManyToManyField(VariationChoice,blank=True)
 
     @property
     def total_product_price(self):

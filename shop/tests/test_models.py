@@ -1,6 +1,12 @@
 from django.test import  TestCase
-from shop.models import Category, Order, OrderItem, Product
+from shop.models import (
+    Category,
+    Order,
+    OrderItem,
+    Product
+    )
 from django.contrib.auth import get_user_model
+
 class CategoryTest(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name="test 123")
