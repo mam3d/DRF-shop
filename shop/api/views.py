@@ -127,7 +127,6 @@ class CheckoutView(APIView):
         }
         response = requests.post("https://api.idpay.ir/v1.1/payment",json=data,headers=headers)
         dic = json.loads(response.content)
-        print(dic["link"])
         order.idpay_code = dic["id"]
         order.save()
         return redirect(str(dic["link"]))
