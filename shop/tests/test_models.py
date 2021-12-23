@@ -1,9 +1,11 @@
 from django.test import  TestCase
+from django.utils import timezone
 from shop.models import (
     Category,
     Order,
     OrderItem,
-    Product
+    Product,
+    DiscountCode
     )
 from django.contrib.auth import get_user_model
 
@@ -93,3 +95,17 @@ class OrderTest(TestCase):
         self.assertFalse(self.order.is_ordered)
         self.assertEqual(str(self.order),"09026673395's order")
         self.assertEqual(self.order.total_order_price,300)
+
+
+class DiscountCodeTest(TestCase):
+    def setUp(self):
+        self.discount = DiscountCode.objects.create(
+                code = "testing",
+                price = 100,
+                date_expires = timezone.now(),
+                )
+
+    def test_model(self):
+        self.assertEqual(self.discount.code,"testing")
+        self.assertEqual(self.discount.price,100)
+        self.assertEqual(str(self.discount),"100 discount code")

@@ -4,7 +4,8 @@ from rest_framework import (
         views,
         permissions,
         response,
-        generics
+        generics,
+        status
         )
 from shop.models import (
     Category, 
@@ -59,7 +60,7 @@ class AddProductToCart(generics.CreateAPIView):
     
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
-        return response.Response("item added to your cart")
+        return response.Response("item added to your cart",status=status.HTTP_201_CREATED)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,8 +74,8 @@ class RemoveProductFromCart(views.APIView):
     def post(self, request):
         serializer = RemoveProductSerializer(data=request.data, context={"request":request})
         serializer.is_valid(raise_exception=True)
-        response = serializer.save()
-        return response.Response(response)
+        response_message = serializer.save()
+        return response.Response(response_message)
     
 
 class Cart(views.APIView):
@@ -84,7 +85,7 @@ class Cart(views.APIView):
         if queryset:
             serializer = CartSerializer(queryset[0])
             return response.Response(serializer.data)
-        return response.Response("your cart is empty")
+        return response.Response("your cart is empty",status=status.HTTP_403_FORBIDDEN)
 
 
 class AddDiscount(views.APIView):

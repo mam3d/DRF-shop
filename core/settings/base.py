@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 from decouple import config
+from celery.schedules import crontab
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -79,6 +80,8 @@ DATABASES = {
         'NAME':config("DATABASE_NAME",cast=str),
         'USER':config("DATABASE_USER",cast=str),
         'PASSWORD':config("DATABASE_PASSWORD",cast=str),
+        'HOST':'db',
+        'PORT':5432
     }
 }
 
@@ -107,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
@@ -135,4 +138,18 @@ AUTH_USER_MODEL = "user.CustomUser"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
+}
+
+# celery config 
+broker_url = "redis://redis:6379"
+result_backend = "redis://redis:6379"
+accept_content = ["json"]
+result_accept_content = ["json"]
+timezone = "Asia/Tehran"
+beat_schedule = {
+    "expire_every_10s":{
+        "task":"shop.tasks.delete_discount",
+        "schedule":crontab(minute=0,hour=0),
+        "relative":"true"
+    }
 }

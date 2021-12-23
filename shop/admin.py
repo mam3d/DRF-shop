@@ -41,5 +41,5 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 @admin.register(DiscountCode)
 class DiscountAdmin(admin.ModelAdmin):
-    list_display = ["code","price","is_active"]
+    list_display = ["code","price","is_active","date_expires"]
     list_filter = ["is_active"]

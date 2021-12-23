@@ -78,6 +78,7 @@ class DiscountCode(models.Model):
     code = models.CharField(max_length=100)
     price = models.IntegerField()
     is_active = models.BooleanField(default=False)
+    date_expires = models.DateTimeField()
 
     def __str__(self):
         return f"{self.price} discount code"
