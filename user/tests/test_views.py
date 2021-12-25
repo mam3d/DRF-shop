@@ -1,4 +1,4 @@
-from django.test import TestCase, client
+from rest_framework.test import APITestCase
 from django.urls import reverse
 from knox.models import AuthToken
 from ..models import (
@@ -7,7 +7,7 @@ from ..models import (
     )
 
 
-class PhoneVerifyCreateTest(TestCase):
+class PhoneVerifyCreateTest(APITestCase):
     def setUp(self):
         self.url = reverse("validate_phone")
 
@@ -15,14 +15,14 @@ class PhoneVerifyCreateTest(TestCase):
         data = {
             "phone":"09026673395"
         }
-        response = self.client.post(self.url,data=data)
+        response = self.client.post(self.url, data=data, format="json")
         self.assertEqual(response.status_code,201)
 
     def test_not_create(self):
         data = {
             "phone":"09026asfa673395"
         }
-        response = self.client.post(self.url,data=data)
+        response = self.client.post(self.url, data=data, format="json")
         self.assertEqual(response.status_code,400)
 
     def test_phone_queryset_exists(self):
@@ -34,13 +34,13 @@ class PhoneVerifyCreateTest(TestCase):
         data = {
             "phone":"09036673395"
         }
-        response = self.client.post(self.url,data=data)
+        response = self.client.post(self.url, data=data, format="json")
         phone = PhoneOtp.objects.get(phone="09036673395")
         self.assertEqual(phone.count,2)
         self.assertEqual(response.status_code,201)
 
 
-class UserRegisterViewTest(TestCase):
+class UserRegisterViewTest(APITestCase):
     def setUp(self):
         self.url = reverse("register")
         self.phone = PhoneOtp.objects.create(
@@ -55,7 +55,7 @@ class UserRegisterViewTest(TestCase):
             "password2":"imtestingit",
             "code":123456.
         }
-        response = self.client.post(self.url,data=data)
+        response = self.client.post(self.url, data=data, format="json")
         self.assertEqual(response.status_code,201)
 
     def test_not_create(self):
@@ -65,10 +65,10 @@ class UserRegisterViewTest(TestCase):
             "password2":"oafasflkafsf",
             "code":00000,
         }
-        response = self.client.post(self.url,data=data)
+        response = self.client.post(self.url, data=data, format="json")
         self.assertEqual(response.status_code,400)
 
-class UserInfoViewTest(TestCase):
+class UserInfoViewTest(APITestCase):
 
     def setUp(self):
         self.url = reverse("user-info")
@@ -79,7 +79,8 @@ class UserInfoViewTest(TestCase):
         self.token = AuthToken.objects.create(user=self.user)
 
     def test_authenticated(self):
-        response = self.client.get(self.url,HTTP_AUTHORIZATION=f"Token {self.token[1]}")
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token[1]}")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code,200)
 
     def test_unauthenticated(self):
