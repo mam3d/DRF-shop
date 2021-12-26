@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from user.api.serializers import (
     PhoneVerifySerializer,
     UserRegisterSerializer,
@@ -5,7 +6,7 @@ from user.api.serializers import (
     UserInfoSerializer
     )
 from django.test import TestCase
-from user.models import CustomUser, PhoneOtp
+from user.models import CustomUser
 
 
 class PhoneSerializerTest(TestCase):
@@ -22,7 +23,7 @@ class PhoneSerializerTest(TestCase):
 class UserRegisterSerializerTest(TestCase):
     
     def test_is_valid(self):
-        phoneotp = PhoneOtp.objects.create(phone="09026673395",code=1243)
+        cache.set("09026673395", 1243)
         data = {
             "phone":"09026673395",
             "password":"testing321",
@@ -39,7 +40,6 @@ class UserRegisterSerializerTest(TestCase):
             "password2":"testing321"
         }
         serializer =  UserRegisterSerializer(data=data)
-        phoneotp = PhoneOtp.objects.create(phone="0912792556",code=1243)
         data2 = {
             "phone":"09026673395",
             "password":"testing321",

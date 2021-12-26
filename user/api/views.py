@@ -1,4 +1,4 @@
-import random
+from django.core.cache import cache
 from rest_framework import (
     permissions,
     response,
@@ -9,7 +9,6 @@ from rest_framework import (
 from knox.models import AuthToken
 from ..models import (
     CustomUser,
-    PhoneOtp
     )
 from .serializers import (
     PhoneVerifySerializer,
@@ -17,32 +16,20 @@ from .serializers import (
     LoginSerializer,
     UserInfoSerializer
     )
+
 from ..helpers import send_sms
 
 
-class PhoneVerifyCreate(generics.CreateAPIView):
-    serializer_class = PhoneVerifySerializer
+class PhoneVerifyCreate(views.APIView):
+    def post(self, request):
+        serializer = PhoneVerifySerializer(data=request.data)
+        if serializer.is_valid():
+            phone = serializer.validated_data["phone"]
+            code = phone = serializer.validated_data["code"]
+            cache.set(phone, code)
+            return response.Response(f"code has been sent to {phone}")
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self,request,*args, **kwargs):
-        super().create(request,*args, **kwargs)
-        return response.Response(
-            {"success":"code has been sent to your phone"},
-            status=status.HTTP_201_CREATED
-            )
-
-    def perform_create(self, serializer):
-        phone = serializer.validated_data.get("phone")
-        code = random.randint(9999,99999)
-        phone_queryset = PhoneOtp.objects.filter(phone=phone)
-        if phone_queryset.exists():
-            phone_verify = phone_queryset[0]
-            phone_verify.code = code
-            phone_verify.count += 1
-            phone_verify.save()
-            # send_sms(code,phone)
-        else:      
-            serializer.save(code=code)
-            # send_sms(code,phone)
 
 class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):

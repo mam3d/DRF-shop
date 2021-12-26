@@ -1,6 +1,5 @@
 from django.utils import timezone
 from rest_framework.test import APITestCase
-from json import dumps
 from django.urls import reverse
 from shop.models import (
         Category,

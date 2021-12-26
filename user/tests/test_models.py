@@ -1,7 +1,6 @@
 from django.test import TestCase
 from user.models import (
     CustomUser,
-    PhoneOtp,
     )
 
 class CustomUserModelTest(TestCase):
@@ -16,18 +15,3 @@ class CustomUserModelTest(TestCase):
         self.assertEqual(self.user.postal_code,None)
         self.assertEqual(str(self.user),"09358733401")
     
-
-
-class CustomUserModelTest(TestCase):
-    def setUp(self):
-        self.phoneotp = PhoneOtp.objects.create(
-            phone = "09358733401",
-            code = 1012,
-            count = 1,
-            )
-
-    def test_phoneotp_created(self):
-        self.assertEqual(self.phoneotp.phone,"09358733401")
-        self.assertEqual(self.phoneotp.code,1012)
-        self.assertEqual(self.phoneotp.count,1)
-        self.assertEqual(str(self.phoneotp),"09358733401's otp")

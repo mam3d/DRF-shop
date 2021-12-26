@@ -118,6 +118,16 @@ USE_L10N = True
 
 USE_TZ = True
 
+CACHES = {
+    "default":{
+        "BACKEND":"django_redis.cache.RedisCache",
+        "LOCATION":"redis://redis:6379",
+        "KEY_PREFIX":"shop",
+        "OPTIONS":{
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        }
+    }
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

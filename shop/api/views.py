@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from rest_framework import (
@@ -28,7 +29,6 @@ from .permissions import (
     UserInfoPermission,
     )
 from user.models import (
-        DoublePay,
         UserOrder
         )
 
@@ -106,16 +106,16 @@ class CheckoutView(views.APIView):
     def post(self, request):
         user = request.user
         response = pay_with_idpay(user)
-        DoublePay.objects.create(user=user,idpay_id=response["id"])
+        cache.set(f"{user.phone}_idpay", response["id"])
         return response.Response(response["link"])
 
     def get(self, request):
-        double_pay = get_object_or_404(DoublePay, user=request.user)
+        idpay_id_in_cache = cache.get(f"{request.user.phone}_idpay")
         idpay_id = request.GET.get("id")
         if idpay_id is None:
             raise Http404
 
-        if int(request.GET.get("status")) == 10 and double_pay.idpay_id == idpay_id:
+        if int(request.GET.get("status")) == 10 and idpay_id_in_cache == idpay_id:
 
             order_id = request.GET.get("order_id")
             order = Order.objects.get(id=order_id)
@@ -132,9 +132,9 @@ class CheckoutView(views.APIView):
                     track_id = request.GET.get("track_id"),
                     order = order,
                     )
-            double_pay.delete()
+            cache.delete(f"{request.user.phone}_idpay")
             return response.Response("thanks for your purchase")
-        double_pay.delete()
+        cache.delete(f"{request.user.phone}_idpay")
         return response.Response("purchase failed")
 
             

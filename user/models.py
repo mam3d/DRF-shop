@@ -44,16 +44,6 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     def __str__(self):
         return str(self.phone)
 
-
-class PhoneOtp(models.Model):
-    phone = models.CharField(max_length=11)
-    code = models.IntegerField()
-    count = models.PositiveIntegerField(default=1)
-
-    def __str__(self):
-        return f"{self.phone}'s otp"
-
-
 class UserOrder(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
     order = models.ForeignKey(Order,on_delete=models.CASCADE)
@@ -63,10 +53,3 @@ class UserOrder(models.Model):
     def __str__(self):
         return f"{self.user}'s order"
 
-
-class DoublePay(models.Model):
-    user = models.OneToOneField(CustomUser,on_delete=models.CASCADE)
-    idpay_id = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.user.phone
