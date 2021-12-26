@@ -1,5 +1,6 @@
+
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404
+from django_filters import rest_framework as filters
 from django.http import Http404
 from rest_framework import (
         views,
@@ -31,6 +32,7 @@ from .permissions import (
 from user.models import (
         UserOrder
         )
+from ..filters import ProductFilter
 
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
@@ -46,6 +48,8 @@ class CategoryDetailView(generics.RetrieveAPIView):
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.filter(is_available=True)
     serializer_class = ProductListSerializer
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = ProductFilter
 
 
 class ProductDetailView(generics.RetrieveAPIView):

@@ -7,12 +7,10 @@ services:
       context: .
       dockerfile: Dockerfile
       network: host
-    command: bash -c "
-      gunicorn core.wsgi -b 0.0.0.0:8000
+    command: 
+      sh -c "python manage.py runserver 0.0.0.0:8000
       && python manage.py collectstatic
       && python manage.py migrate"
-    environment:
-      - PRODUCTION=1
     restart: on-failure
     ports:
       - "8000:8000"
@@ -80,7 +78,9 @@ services:
     image: nginx
     networks:
       - shop
-    command: nginx -g "daemon off;"
+    command: nginx -g 'daemon off;'
+    ports:
+      - "8080:80"
     environment:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_files:/django/static

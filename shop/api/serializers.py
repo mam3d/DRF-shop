@@ -16,9 +16,10 @@ class CategoryListSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="product",lookup_field ="slug")
+    category = serializers.StringRelatedField()
     class Meta:
         model = Product
-        fields = ['url',"name","description","price"]
+        fields = ['url',"name","description","price","category"]
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
