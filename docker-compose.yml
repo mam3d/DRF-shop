@@ -8,9 +8,11 @@ services:
       dockerfile: Dockerfile
       network: host
     command: 
-      sh -c "python manage.py runserver 0.0.0.0:8000
+      sh -c "gunicorn core.wsgi -b 0.0.0.0:8000
       && python manage.py collectstatic
       && python manage.py migrate"
+    environment:
+      - PRODUCTION=1
     restart: on-failure
     ports:
       - "8000:8000"
